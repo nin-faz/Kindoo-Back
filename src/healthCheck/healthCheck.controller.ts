@@ -1,7 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 import { QueueService } from 'src/bullMQ/queue.service';
 import { InjectQueue } from '@nestjs/bullmq';
-// import { Queue } from 'bullmq';
 
 @Controller('healthCheck')
 export class HealthCheckController {
@@ -13,6 +12,7 @@ export class HealthCheckController {
   async healthCheck() {
     await this.queueService.addJob('example-job', {
       message: 'Hello, BullMQ!',
+      timestamp: new Date().toISOString(),
     });
     return { status: 'Job added to queue' };
   }
