@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { QueueService } from 'src/buulMQ/queue.service';
+import { QueueService } from 'src/bullMQ/queue.service';
 import { InjectQueue } from '@nestjs/bullmq';
 // import { Queue } from 'bullmq';
 
@@ -9,7 +9,7 @@ export class HealthCheckController {
     @InjectQueue('healthCheck') private readonly queueService: QueueService,
   ) {}
 
-  @Get('health-check')
+  @Get('')
   async healthCheck() {
     await this.queueService.addJob('example-job', {
       message: 'Hello, BullMQ!',
