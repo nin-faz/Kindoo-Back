@@ -10,6 +10,18 @@ services:
     networks:
       - app-network
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    depends_on:
+      - redis
+    restart: always
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

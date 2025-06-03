@@ -1,0 +1,31 @@
+name: Build NestJS Project
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Nest CLI
+        run: npm install -g @nestjs/cli
+
+      - name: Build NestJS project
+        run: nest build
+
+      - name: Run docker
+        run: docker-compose up -d
