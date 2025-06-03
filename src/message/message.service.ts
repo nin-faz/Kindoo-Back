@@ -5,7 +5,29 @@ import { CreateMessageInput } from './dto/create-message.input';
 
 @Injectable()
 export class MessageService {
-  private e_messages: Message[] = [];
+  private e_messages: Message[] = [
+    {
+      id: uuidv4(),
+      content: 'Hello, this is a mock message 1',
+      createdAt: new Date(Date.now() - 100000),
+      authorId: 'user1',
+      conversationId: '1'
+    },
+    {
+      id: uuidv4(),
+      content: 'Hi, this is a mock message 2',
+      createdAt: new Date(Date.now() - 90000),
+      authorId: 'user2',
+      conversationId: '1'
+    },
+    {
+      id: uuidv4(),
+      content: 'Bonjour, message fictif 3',
+      createdAt: new Date(Date.now() - 80000),
+      authorId: 'user1',
+      conversationId: '2'
+    }
+  ];
 
   create(p_createMessageDto : CreateMessageInput): Message {
     const newMessage: Message = {
