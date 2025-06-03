@@ -4,6 +4,15 @@ import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bullmq';
 import { HealthCheckController } from './healthCheck/healthCheck.controller';
 import { QueueService } from './bullMQ/queue.service';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
+import { UsersModule } from './users/users.module';
+import { MessageModule } from './message/message.module';
+import { ConversationModule } from './conversation/conversation.module';
+import { MessageService } from './message/message.service';
+import { ConversationService } from './conversation/conversation.service';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -16,8 +25,18 @@ import { QueueService } from './bullMQ/queue.service';
     BullModule.registerQueue({
       name: 'healthCheck',
     }),
+
+    
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      sortSchema: true,
+    }),
+    UsersModule,
+    MessageModule,
+    ConversationModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, QueueService],
+  providers: [AppService, QueueService, MessageService, ConversationService, UsersService],
 })
 export class AppModule {}

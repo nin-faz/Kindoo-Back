@@ -1,7 +1,7 @@
 import { Worker } from 'bullmq';
 
 const worker = new Worker(
-  'healthCheck',
+  'messages',
   async (job) => {
     console.log(`🔄 Processing job ${job.id}:`, job.data);
     console.log(`📝 Job name: ${job.name}`);

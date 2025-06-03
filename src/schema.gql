@@ -1,0 +1,74 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+"""Conversation model"""
+type Conversation {
+  createdAt: DateTime!
+  id: ID!
+
+  """ID Participants"""
+  participants: [User!]!
+}
+
+input CreateConversationInput {
+  """Liste des IDs des participants"""
+  participantIds: [ID!]!
+}
+
+input CreateMessageInput {
+  authorId: String!
+  content: String!
+  conversationId: String!
+}
+
+input CreateUserInput {
+  password: String!
+  userName: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""Message model"""
+type Message {
+  authorId: ID!
+  content: String!
+  conversationId: ID!
+  createdAt: DateTime!
+  id: ID!
+}
+
+type Mutation {
+  createConversation(createConversationInput: CreateConversationInput!): Conversation!
+  createUser(createUserInput: CreateUserInput!): User!
+  removeUser(p_id: String!): User!
+  sendMessage(createMessageInput: CreateMessageInput!): Message!
+  updateUser(p_id: String!, p_updateUserInput: UpdateUserInput!): User!
+}
+
+type Query {
+  findAll: [Conversation!]!
+  findByParticipantId(participantId: String!): [Conversation!]!
+  findOne(id: Int!): Conversation!
+  getAllMessages: [Message!]!
+  getByConversationId(conversationId: String!): [Message!]!
+  getMessageById(id: String!): Message!
+  getMessagesByAuthor(authorId: String!): [Message!]!
+  users: [User!]!
+}
+
+input UpdateUserInput {
+  password: String
+  userName: String
+}
+
+"""User model"""
+type User {
+  createdAt: DateTime!
+  id: ID!
+  password: String!
+  username: String!
+}
