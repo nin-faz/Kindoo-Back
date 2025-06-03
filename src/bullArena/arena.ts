@@ -15,6 +15,15 @@ const arenaConfig = Arena(
           port: 6379,
         },
       },
+      {
+        type: 'bullmq',
+        name: 'messages',
+        hostId: 'Local',
+        redis: {
+          host: 'localhost',
+          port: 6379,
+        },
+      },
     ],
   },
   {

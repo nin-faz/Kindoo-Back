@@ -8,10 +8,10 @@ export class MessageResolver {
   constructor(private readonly s_messageService: MessageService) {}
 
   @Mutation(() => Message)
-  sendMessage(
+  async sendMessage(
     @Args('createMessageInput') p_createMessageInput: CreateMessageInput
-  ): Message {
-    return this.s_messageService.create(p_createMessageInput);
+  ): Promise<Message> {
+    return await this.s_messageService.create(p_createMessageInput);
   }
 
   @Query(() => [Message])
