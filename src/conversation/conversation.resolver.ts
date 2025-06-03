@@ -12,18 +12,18 @@ export class ConversationResolver {
     return this.s_conversationService.create(createConversationInput);
   }
 
-  @Query(() => [Conversation], { name: 'conversation' })
+  @Query(() => [Conversation])
   findAll() {
     return this.s_conversationService.findAll();
   }
 
-  @Query(() => Conversation, { name: 'conversation' })
+  @Query(() => Conversation)
   findOne(@Args('id', { type: () => Int }) p_id: number) {
     return this.s_conversationService.findOne(p_id.toString());
   }
 
-  @Query(() => [Conversation], { name: 'conversationByParticipantId' })
-  findConversationByParticipantId(@Args('participantId', { type: () => String }) p_participantId: string) {
-    return this.s_conversationService.findConversationByParticipantId(p_participantId);
+  @Query(() => [Conversation])
+  findByParticipantId(@Args('participantId', { type: () => String }) p_participantId: string) {
+    return this.s_conversationService.findByParticipantId(p_participantId);
   }
 }

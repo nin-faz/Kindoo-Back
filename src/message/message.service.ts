@@ -2,9 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { Message } from './entities/message.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateMessageInput } from './dto/create-message.input';
+import { InjectQueue } from '@nestjs/bullmq';
+import { QueueService } from 'src/bullMQ/queue.service';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class MessageService {
+
+    constructor(
+      @InjectQueue('messages') private readonly s_queueService: QueueService,
+    ) {}
+    
   private e_messages: Message[] = [
     {
       id: uuidv4(),
@@ -29,16 +37,24 @@ export class MessageService {
     }
   ];
 
-  create(p_createMessageDto : CreateMessageInput): Message {
-    const newMessage: Message = {
+  async create(p_createMessageDto : CreateMessageInput): Promise<Message> {
+    const v_newMessage: Message = {
       id: uuidv4(),
       content: p_createMessageDto.content,
       createdAt: new Date(),
       authorId: p_createMessageDto.authorId,
       conversationId: p_createMessageDto.conversationId
     };
-    this.e_messages.push(newMessage);
-    return newMessage;
+    this.e_messages.push(v_newMessage);
+
+    await this.s_queueService.addJob(`Conversation ${v_newMessage.conversationId}`, {
+      messageId: v_newMessage.id,
+      content: v_newMessage.content,
+      authorId: v_newMessage.authorId,
+      conversationId: v_newMessage.conversationId,
+      createdAt: v_newMessage.createdAt.toISOString()
+    });
+    return v_newMessage;
   }
 
   findAll(): Message[] {

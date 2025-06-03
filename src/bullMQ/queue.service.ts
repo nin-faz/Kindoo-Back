@@ -5,7 +5,7 @@ import { Queue } from 'bullmq';
 @Injectable()
 export class QueueService {
   constructor(
-    @InjectQueue('healthCheck') private readonly queue: Queue,
+    @InjectQueue('messages') private readonly queue: Queue, // nom en minuscules
   ) {}
 
   async addJob(name: string, data: any) {

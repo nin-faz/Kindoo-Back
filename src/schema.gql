@@ -50,13 +50,13 @@ type Mutation {
 }
 
 type Query {
-  conversation(id: Int!): Conversation!
-  conversationByParticipantId(participantId: String!): [Conversation!]!
+  findAll: [Conversation!]!
+  findByParticipantId(participantId: String!): [Conversation!]!
+  findOne(id: Int!): Conversation!
   getAllMessages: [Message!]!
-  getMessageById(id: String!): Message
+  getByConversationId(conversationId: String!): [Message!]!
+  getMessageById(id: String!): Message!
   getMessagesByAuthor(authorId: String!): [Message!]!
-  getMessagesByConversationId(conversationId: String!): [Message!]
-  user(p_id: String!): User!
   users: [User!]!
 }
 

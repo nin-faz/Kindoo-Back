@@ -10,6 +10,9 @@ import { join } from 'path';
 import { UsersModule } from './users/users.module';
 import { MessageModule } from './message/message.module';
 import { ConversationModule } from './conversation/conversation.module';
+import { MessageService } from './message/message.service';
+import { ConversationService } from './conversation/conversation.service';
+import { UsersService } from './users/users.service';
 
 @Module({
   imports: [
@@ -22,6 +25,8 @@ import { ConversationModule } from './conversation/conversation.module';
     BullModule.registerQueue({
       name: 'healthCheck',
     }),
+
+    
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -32,6 +37,6 @@ import { ConversationModule } from './conversation/conversation.module';
     ConversationModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, QueueService],
+  providers: [AppService, QueueService, MessageService, ConversationService, UsersService],
 })
 export class AppModule {}

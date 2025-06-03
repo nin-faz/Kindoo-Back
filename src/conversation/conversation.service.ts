@@ -74,7 +74,7 @@ export class ConversationService {
     return this.e_conversation.find(conversation => conversation.id === p_id);
   }
 
-  findConversationByParticipantId(p_participantId: string): Conversation[] {
+  findByParticipantId(p_participantId: string): Conversation[] {
     return this.e_conversation.filter(conversation =>
       conversation.participants.some(participant => participant.id === p_participantId)
     );
