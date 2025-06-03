@@ -7,7 +7,9 @@ import { QueueService } from './bullMQ/queue.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-import { TestResolver } from './exemple/exemple.resolver';
+import { UsersModule } from './users/users.module';
+import { MessageModule } from './message/message.module';
+import { ConversationModule } from './conversation/conversation.module';
 
 @Module({
   imports: [
@@ -25,8 +27,11 @@ import { TestResolver } from './exemple/exemple.resolver';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
     }),
+    UsersModule,
+    MessageModule,
+    ConversationModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, QueueService, TestResolver],
+  providers: [AppService, QueueService],
 })
 export class AppModule {}
