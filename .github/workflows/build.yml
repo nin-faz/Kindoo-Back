@@ -26,3 +26,6 @@ jobs:
 
       - name: Build NestJS project
         run: nest build
+
+      - name: Run docker
+        run: docker-compose up -d
