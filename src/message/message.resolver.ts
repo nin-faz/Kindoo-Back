@@ -24,13 +24,13 @@ export class MessageResolver {
     return this.s_messageService.findByAuthorId(p_authorId);
   }
 
-  @Query(() => Message, { nullable: true })
+  @Query(() => Message)
   getMessageById(@Args('id') p_id: string): Message | undefined {
     return this.s_messageService.findById(p_id);
   }
 
-  @Query(() => [Message], { nullable: true })
-  getMessagesByConversationId(
+  @Query(() => [Message])
+  getByConversationId(
     @Args('conversationId') p_conversationId: string
   ): Message[] {
     return this.s_messageService.findByConversationId(p_conversationId);
