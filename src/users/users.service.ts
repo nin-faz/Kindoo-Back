@@ -2,19 +2,35 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { User } from './entities/user.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   private e_users: User[] = [];
+
+  private readonly users = [
+    {
+      userId: 1,
+      username: 'john',
+      password: 'changeme',
+    },
+    {
+      userId: 2,
+      username: 'maria',
+      password: 'guess',
+    },
+  ];
+  
   private v_count: number = 0;
   
   create(p_createUserInput: CreateUserInput): User {
-
+    const saltOrRounds = 10;
+    const v_password = bcrypt.hashSync(p_createUserInput.password, saltOrRounds);
     const v_userCreated: User = {
       userName: p_createUserInput.userName,
       id: `${this.v_count}`,
       createdAt: new Date(),
-      password: p_createUserInput.password
+      password: v_password
     };
     this.e_users.push(v_userCreated);
     this.v_count++;
@@ -25,7 +41,12 @@ export class UsersService {
     return this.e_users;
   }
 
-  findOne(p_id: string) {
+  findOne(username: string) {
+    // Recherche l'utilisateur par userName
+    return this.e_users.find((user) => user.userName === username);
+  }
+
+  findOneById(p_id: string) {
     return this.e_users.find((user) => user.id === p_id);
   }
 
