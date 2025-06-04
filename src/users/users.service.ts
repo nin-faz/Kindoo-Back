@@ -35,7 +35,6 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${p_id} not found`);
     }
     const oldUser = this.e_users[v_userIndex];
-    // Correction : n'utilise que les champs existants dans User
     const updatedUser: User = {
       ...oldUser,
       userName: p_updateUserInput.userName ?? oldUser.userName,
