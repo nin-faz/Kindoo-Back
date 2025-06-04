@@ -26,7 +26,6 @@ export class UsersService {
   }
 
   findOne(username: string) {
-    // Recherche l'utilisateur par userName
     return this.e_users.find((user) => user.userName === username);
   }
 
