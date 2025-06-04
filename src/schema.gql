@@ -2,17 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-"""Conversation model"""
+"""
+Conversation model
+"""
 type Conversation {
   createdAt: DateTime!
   id: ID!
 
-  """ID Participants"""
+  """
+  ID Participants
+  """
   participants: [User!]!
 }
 
 input CreateConversationInput {
-  """Liste des IDs des participants"""
+  """
+  Liste des IDs des participants
+  """
   participantIds: [ID!]!
 }
 
@@ -32,7 +38,9 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-"""Message model"""
+"""
+Message model
+"""
 type Message {
   authorId: ID!
   content: String!
@@ -42,7 +50,9 @@ type Message {
 }
 
 type Mutation {
-  createConversation(createConversationInput: CreateConversationInput!): Conversation!
+  createConversation(
+    createConversationInput: CreateConversationInput!
+  ): Conversation!
   createUser(createUserInput: CreateUserInput!): User!
   removeUser(p_id: String!): User!
   sendMessage(createMessageInput: CreateMessageInput!): Message!
@@ -65,10 +75,12 @@ input UpdateUserInput {
   userName: String
 }
 
-"""User model"""
+"""
+User model
+"""
 type User {
   createdAt: DateTime!
   id: ID!
   password: String!
-  username: String!
+  userName: String!
 }
