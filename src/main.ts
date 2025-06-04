@@ -5,6 +5,8 @@ import { setupArena } from './bullArena/arena';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.enableCors();
+
   // Récupère l'instance Express par défaut
   const expressApp = app.getHttpAdapter().getInstance();
 
