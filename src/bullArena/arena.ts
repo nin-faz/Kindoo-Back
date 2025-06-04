@@ -11,7 +11,7 @@ const arenaConfig = Arena(
         name: 'healthCheck',
         hostId: 'Local',
         redis: {
-          host: 'localhost',
+          host: 'redis',
           port: 6379,
         },
       },
@@ -20,7 +20,7 @@ const arenaConfig = Arena(
         name: 'messages',
         hostId: 'Local',
         redis: {
-          host: 'localhost',
+          host: 'redis',
           port: 6379,
         },
       },

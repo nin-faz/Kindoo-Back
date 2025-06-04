@@ -8,7 +8,7 @@ async function bootstrap() {
   const server = express();
   const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
 
-  setupArena(server);
+  setupArena(app.getHttpAdapter().getInstance());
 
   await app.listen(process.env.PORT ?? 3000);
 }
