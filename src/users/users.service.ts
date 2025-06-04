@@ -25,7 +25,12 @@ export class UsersService {
     return this.e_users;
   }
 
-  findOne(p_id: string) {
+  findOne(username: string) {
+    // Recherche l'utilisateur par userName
+    return this.e_users.find((user) => user.userName === username);
+  }
+
+  findOneById(p_id: string) {
     return this.e_users.find((user) => user.id === p_id);
   }
 
