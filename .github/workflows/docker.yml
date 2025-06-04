@@ -2,7 +2,7 @@ name: Docker compose
 
 on:
   workflow_run:
-    workflows: [Build NestJS Project]
+    workflows: [build]
     types:
       - completed
 
