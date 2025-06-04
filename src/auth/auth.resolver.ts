@@ -14,3 +14,4 @@ export class AuthResolver {
     return result.access_token;
   }
 }
+

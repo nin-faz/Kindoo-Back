@@ -43,3 +43,4 @@ import { AuthService } from './auth/auth.service';
   providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService],
 })
 export class AppModule {}
+
