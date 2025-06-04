@@ -1,6 +1,9 @@
 name: Docker compose
 
 on:
+  pull_request:
+    branches:
+      - main
   push:
     branches:
       - main
