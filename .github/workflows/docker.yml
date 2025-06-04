@@ -10,15 +10,17 @@ jobs:
   compose:
     runs-on: ubuntu-latest
     steps:
-      -
-        name: Set up Docker Compose
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Compose
         uses: docker/setup-compose-action@v1
 
-      -
-        name: Run docker compose
+      - name: Run docker compose with hoverkraft
         uses: hoverkraft-tech/compose-action@v2.0.1
         with:
-          compose-file: "./docker-compose.yml"
-      -
-        name: Run Docker Compose
-        run: docker compose up -d 
+          compose-file: ./docker-compose.yml
+          cwd: ./  # Adjust if needed, this sets the working directory
+
+      - name: Run Docker Compose manually (if needed)
+        run: docker compose up -d
