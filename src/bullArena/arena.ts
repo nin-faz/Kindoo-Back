@@ -1,8 +1,14 @@
-const Arena = require('bull-arena');
+import { Express, Router } from 'express';
 import { Queue } from 'bullmq';
-import { Express } from 'express';
 
-const arenaConfig = Arena(
+// ⚠️ bull-arena est en CommonJS, donc on l'importe avec require
+const Arena = require('bull-arena');
+
+// On crée un routeur Express séparé
+const router: Router = require('express').Router();
+
+// Configuration d'Arena
+const arena = Arena(
   {
     BullMQ: Queue,
     queues: [
@@ -31,6 +37,10 @@ const arenaConfig = Arena(
   }
 );
 
+// On monte Arena sur le routeur
+router.use('/', arena);
+
+// Fonction d'attachement au serveur Express
 export function setupArena(app: Express) {
-  app.use('/arena', arenaConfig);
+  app.use('/arena', router);
 }
