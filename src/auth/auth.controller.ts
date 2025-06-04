@@ -10,4 +10,3 @@ export class AuthController {
     return this.authService.signIn(body.username, body.pass);
   }
 }
-
