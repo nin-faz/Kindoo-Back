@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { MessageResolver } from './message.resolver';
-import { QueueService } from 'src/bullMQ/queue.service';
+import { QueueService } from '../bullMQ/queue.service';
 import { BullModule } from '@nestjs/bullmq';
 
 @Module({

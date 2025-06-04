@@ -1,5 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
-import { QueueService } from 'src/bullMQ/queue.service';
+import { QueueService } from '../bullMQ/queue.service';
 import { InjectQueue } from '@nestjs/bullmq';
 
 @Controller('healthCheck')
