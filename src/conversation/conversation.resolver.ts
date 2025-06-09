@@ -26,4 +26,9 @@ export class ConversationResolver {
   findByParticipantId(@Args('participantId', { type: () => String }) p_participantId: string) {
     return this.s_conversationService.findByParticipantId(p_participantId);
   }
+
+  @Query(() => Conversation)
+  findByParticipants(@Args('participantsIds', { type: () => [String] }) p_participantsIds: string[]) {
+    return this.s_conversationService.findByParticipants(p_participantsIds);
+  }
 }

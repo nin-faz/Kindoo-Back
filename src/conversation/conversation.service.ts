@@ -2,10 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { CreateConversationInput } from './dto/create-conversation.input';
 import { v4 as uuidv4 } from 'uuid';
 import { Conversation } from './entities/conversation.entity';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ConversationService {
   private e_conversation: Conversation[] = [];
+
+  constructor( private readonly usersService: UsersService) {}
 
   private findUserById(userId: string) {
     for (const conv of this.e_conversation) {
@@ -15,23 +18,16 @@ export class ConversationService {
     return null;
   }
 
-  create(p_createConversationInput: CreateConversationInput) {
+  async create(p_createConversationInput: CreateConversationInput) {
     // Pour chaque participant, récupère toutes les infos si elles existent déjà
-    const v_participants = p_createConversationInput.participantIds.map(
-      (id) => {
-        const existing = this.findUserById(id);
-        if (existing) {
-          return { ...existing };
-        }
-        // fallback minimal si l'utilisateur n'existe pas dans les mocks
-        return {
-          id,
-          userName: 'Unknown',
-          password: '',
-          createdAt: new Date(),
-        };
-      },
-    );
+    const v_participants = (
+      await Promise.all(
+        p_createConversationInput.participantIds.map(async (id) => {
+          const existing = await this.usersService.findOneById(id);
+          return existing ? { ...existing } : null;
+        }),
+      )
+    ).filter((participant) => participant !== null);
 
     const v_newConversation: Conversation = {
       id: uuidv4(),
@@ -54,6 +50,14 @@ export class ConversationService {
     return this.e_conversation.filter((conversation) =>
       conversation.participants.some(
         (participant) => participant.id === p_participantId,
+      ),
+    );
+  }
+
+  findByParticipants(p_participantsIds: string[]): Conversation | undefined {
+    return this.e_conversation.find((conversation) =>
+      conversation.participants.every((participant) =>
+        p_participantsIds.includes(participant.id),
       ),
     );
   }
