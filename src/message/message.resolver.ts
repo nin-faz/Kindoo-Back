@@ -15,24 +15,26 @@ export class MessageResolver {
   }
 
   @Query(() => [Message])
-  getAllMessages(): Message[] {
+  async getAllMessages(): Promise<Message[]> {
     return this.s_messageService.findAll();
   }
 
   @Query(() => [Message])
-  getMessagesByAuthor(@Args('authorId') p_authorId: string): Message[] {
+  async getMessagesByAuthor(
+    @Args('authorId') p_authorId: string,
+  ): Promise<Message[]> {
     return this.s_messageService.findByAuthorId(p_authorId);
   }
 
-  @Query(() => Message)
-  getMessageById(@Args('id') p_id: string): Message | undefined {
+  @Query(() => Message, { nullable: true })
+  async getMessageById(@Args('id') p_id: string): Promise<Message | null> {
     return this.s_messageService.findById(p_id);
   }
 
   @Query(() => [Message])
-  getByConversationId(
-    @Args('conversationId') p_conversationId: string
-  ): Message[] {
+  async getByConversationId(
+    @Args('conversationId') p_conversationId: string,
+  ): Promise<Message[]> {
     return this.s_messageService.findByConversationId(p_conversationId);
   }
 }

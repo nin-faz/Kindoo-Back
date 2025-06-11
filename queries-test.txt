@@ -1,0 +1,69 @@
+// Creation de 2 Users
+mutation {
+  user1: createUser(createUserInput: {
+    userName: "UserA",
+    password: "1234"
+  }) {
+    id
+    userName
+  }
+
+  user2: createUser(createUserInput: {
+    userName: "UserB",
+    password: "5678"
+  }) {
+    id
+    userName
+  }
+}
+
+
+// Creer une  conversation entre 2 users
+mutation {
+  createConversation(createConversationInput: {
+    participantIds: ["ID_UserA", "ID_UserB"]
+  }) {
+    id
+    createdAt
+    participants {
+      id
+      userName
+    }
+  }
+}
+
+// Envoyer un message 
+mutation {
+  sendMessage(createMessageInput: {
+    content: "Salut Bob !",
+    authorId: "ID_UserA",
+    conversationId: "ID_Conv"
+  }) {
+    content
+    authorId
+    conversationId
+    createdAt
+  }
+}
+
+
+// Recuperer tous les messages d'une conversastion 
+query {
+  getByConversationId(conversationId: "ID_Conv") {
+    id
+    content
+    authorId
+    createdAt
+  }
+}
+
+// Voir les details des conversation d'un utilisateur 
+query {
+  findByParticipantId(participantId: "ID_User") {
+    id
+    createdAt
+    participants {
+      userName
+    }
+  }
+}
