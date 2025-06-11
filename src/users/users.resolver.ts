@@ -9,30 +9,31 @@ export class UsersResolver {
   constructor(private readonly s_usersService: UsersService) {}
 
   @Mutation(() => User)
-  createUser(@Args('createUserInput') p_createUserInput: CreateUserInput) {
+  async createUser(@Args('createUserInput') p_createUserInput: CreateUserInput): Promise<User> {
     return this.s_usersService.create(p_createUserInput);
   }
 
   @Query(() => [User], { name: 'users' })
-  findAll() {
+  async findAll(): Promise<User[]> {
     return this.s_usersService.findAll();
   }
 
+
   @Query(() => User)
-  findOne(@Args('p_id', { type: () => String }) p_id: string) {
+  async findOne(@Args('p_id', { type: () => String }) p_id: string): Promise<User | null> {
     return this.s_usersService.findOne(p_id);
   }
 
   @Mutation(() => User)
-  updateUser(
+  async updateUser(
     @Args('p_updateUserInput') p_updateUserInput: UpdateUserInput,
     @Args('p_id') p_id: string,
-  ) {
+  ): Promise<User> {
     return this.s_usersService.update(p_id, p_updateUserInput);
   }
 
-  @Mutation(() => User)
-  removeUser(@Args('p_id', { type: () => String }) p_id: string) {
+  @Mutation(() => String)
+  async removeUser(@Args('p_id', { type: () => String }) p_id: string): Promise<string> {
     return this.s_usersService.remove(p_id);
   }
 }

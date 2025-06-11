@@ -15,6 +15,7 @@ import { ConversationService } from './conversation/conversation.service';
 import { UsersService } from './users/users.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AuthService } from './auth/auth.service';
     AuthModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService],
+  providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService, PrismaService],
+  exports: [PrismaService],
 })
 export class AppModule {}
