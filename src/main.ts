@@ -1,14 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { setupArena } from './bullArena/arena';
-import { ExpressAdapter } from '@nestjs/platform-express';
-import * as express from 'express';
 
 async function bootstrap() {
-  const server = express();
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(server));
+  const app = await NestFactory.create(AppModule);
 
-  setupArena(app.getHttpAdapter().getInstance());
+  // Récupère l'instance Express par défaut
+  const expressApp = app.getHttpAdapter().getInstance();
+
+  // Setup bull-arena avec Express directement
+  setupArena(expressApp);
 
   await app.listen(process.env.PORT ?? 3000);
 }
