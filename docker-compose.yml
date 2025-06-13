@@ -22,6 +22,19 @@ services:
     networks:
       - app-network
 
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    restart: always
+    networks:
+      - app-network
+    command: ["node", "dist/src/bullMQ/queue.consumer.js"]
+    environment:
+      - REDIS_HOST=redis
+
 networks:
   app-network:
     driver: bridge
