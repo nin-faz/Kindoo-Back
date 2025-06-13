@@ -29,28 +29,18 @@ export class MessageService {
       conversationId: p_createMessageDto.conversationId,
     };
 
-    const v_savedMessage = await this.s_prismaService.message.create({
-      data: {
-        id: v_newMessage.id,
+    await this.s_queueService.addJob(
+      `Conversation ${v_newMessage.conversationId}`,
+      {
+        messageId: v_newMessage.id,
         content: v_newMessage.content,
-        createdAt: v_newMessage.createdAt,
         authorId: v_newMessage.authorId,
         conversationId: v_newMessage.conversationId,
-      },
-    });
-
-    await this.s_queueService.addJob(
-      `Conversation ${v_savedMessage.conversationId}`,
-      {
-        messageId: v_savedMessage.id,
-        content: v_savedMessage.content,
-        authorId: v_savedMessage.authorId,
-        conversationId: v_savedMessage.conversationId,
-        createdAt: v_savedMessage.createdAt.toISOString(),
+        createdAt: v_newMessage.createdAt.toISOString(),
       },
     );
 
-    return v_savedMessage;
+    return v_newMessage;
   }
 
   findAll(): Promise<Message[]> {
@@ -68,7 +58,7 @@ export class MessageService {
 
   findById(p_id: string): Promise<Message | null> {
     return this.s_prismaService.message.findUnique({
-      where: { id: p_id },
+      where: { id: p_id }, 
     });
   }
 
