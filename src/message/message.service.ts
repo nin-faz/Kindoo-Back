@@ -58,7 +58,7 @@ export class MessageService {
 
   findById(p_id: string): Promise<Message | null> {
     return this.s_prismaService.message.findUnique({
-      where: { id: p_id },
+      where: { id: p_id }, 
     });
   }
 
