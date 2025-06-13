@@ -15,6 +15,9 @@ COPY .env .env
 # Copy the rest of the application files
 COPY . .
 
+# Run Prisma generate
+RUN npx prisma generate
+
 # Build the NestJS application
 RUN npm run build
 
