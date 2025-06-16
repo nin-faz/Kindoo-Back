@@ -19,9 +19,6 @@ export function startWorker(p_gateway: MessageGateway) {
       connection: {
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT) || 6379,
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD,
-        ...(process.env.REDIS_TLS === 'true' ? { tls: {} } : {}),
       },
     },
   );
