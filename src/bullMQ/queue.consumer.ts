@@ -1,9 +1,7 @@
 import { Worker } from 'bullmq';
-import { PrismaClient } from '@prisma/client';
+import { MessageGateway } from 'src/message/message.gateway';
 
-const prisma = new PrismaClient();
-
-export function startWorker() {
+export function startWorker(p_gateway: MessageGateway) {
   if (!process.env.REDIS_HOST) {
     throw new Error('❌ REDIS_HOST is not defined');
   }
@@ -15,22 +13,15 @@ export function startWorker() {
       console.log(`📝 Job name: ${job.name}`);
       console.log(`⏰ Job timestamp: ${new Date(job.timestamp).toISOString()}`);
 
-      const v_savedMessage = await prisma.message.create({
-        data: {
-          id: job.data.messageId,
-          content: job.data.content,
-          createdAt: new Date(job.data.createdAt),
-          authorId: job.data.authorId,
-          conversationId: job.data.conversationId,
-        },
-      });
-
-      console.log(`✅ Message enregistré en BDD avec l'id: ${v_savedMessage.id}`);
+      p_gateway.sendNewMessage(job.data);
     },
     {
       connection: {
         host: process.env.REDIS_HOST,
         port: Number(process.env.REDIS_PORT) || 6379,
+        username: process.env.REDIS_USERNAME,
+        password: process.env.REDIS_PASSWORD,
+        ...(process.env.REDIS_TLS === 'true' ? { tls: {} } : {}),
       },
     },
   );

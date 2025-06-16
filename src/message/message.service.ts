@@ -18,8 +18,6 @@ export class MessageService {
 
   private readonly s_prismaService: PrismaService;
 
-  private readonly e_messages: Message[] = [];
-
   async create(p_createMessageDto: CreateMessageInput): Promise<Message> {
     const v_newMessage: Message = {
       id: uuidv4(),
@@ -29,18 +27,22 @@ export class MessageService {
       conversationId: p_createMessageDto.conversationId,
     };
 
+    const v_savedMessage = await this.s_prismaService.message.create({
+      data: v_newMessage,
+    });
+
     await this.s_queueService.addJob(
-      `Conversation ${v_newMessage.conversationId}`,
+      `Conversation ${v_savedMessage.conversationId}`,
       {
-        messageId: v_newMessage.id,
-        content: v_newMessage.content,
-        authorId: v_newMessage.authorId,
-        conversationId: v_newMessage.conversationId,
-        createdAt: v_newMessage.createdAt.toISOString(),
+        messageId: v_savedMessage.id,
+        content: v_savedMessage.content,
+        authorId: v_savedMessage.authorId,
+        conversationId: v_savedMessage.conversationId,
+        createdAt: v_savedMessage.createdAt.toISOString(),
       },
     );
-
-    return v_newMessage;
+    console.log('✅ Job ajouté dans la queue BullMQ');
+    return v_savedMessage;
   }
 
   findAll(): Promise<Message[]> {
