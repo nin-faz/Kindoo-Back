@@ -22,18 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build NestJS project
-        run: npm run build
-
-      - name: Start backend server
+      - name: Install Newman + HTML reporter
         run: |
-          npm run start:dev &   # ou `start:prod` selon ton script
-          sleep 10              # attendre le démarrage du serveur
+          npm install -g newman newman-reporter-html
 
-      - name: Install Newman
-        run: npm install -g newman
-
-      - name: Run Postman tests
+      - name: Run Postman tests against Render
         run: |
           newman run test/kindoo.postman_collection.json \
             -e test/kindoo-env.postman_environment.json \
