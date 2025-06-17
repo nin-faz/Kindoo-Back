@@ -51,12 +51,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
@@ -104,12 +105,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
@@ -156,12 +158,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
@@ -208,12 +211,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
@@ -260,12 +264,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
@@ -313,12 +318,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/graphql",
-					"protocol": "http",
+					"raw": "https://kindoo-back.onrender.com/graphql",
+					"protocol": "https",
 					"host": [
-						"localhost"
+						"kindoo-back",
+						"onrender",
+						"com"
 					],
-					"port": "3000",
 					"path": [
 						"graphql"
 					]
