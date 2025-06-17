@@ -5,7 +5,6 @@ import { MessageService } from './message.service';
 describe('MessageResolver', () => {
   let resolver: MessageResolver;
 
-  // Mock basique du MessageService avec findAll mockée
   const mockMessageService = {
     findAll: jest.fn().mockReturnValue([
       {
@@ -59,8 +58,17 @@ describe('MessageResolver', () => {
     expect(result).toEqual(createdMessage);
   });
 
-  it('should return all messages from getAllMessages', () => {
-    const result = resolver.getAllMessages();
+  it('should return all messages from getAllMessages', async () => {
+    mockMessageService.findAll.mockResolvedValue([
+      {
+        id: '1',
+        content: 'Hello',
+        authorId: 'a1',
+        conversationId: 'c1',
+        createdAt: new Date(),
+      },
+    ]);
+    const result = await resolver.getAllMessages();
     expect(result).toEqual([
       {
         id: '1',
@@ -73,7 +81,7 @@ describe('MessageResolver', () => {
     expect(mockMessageService.findAll).toHaveBeenCalledTimes(1);
   });
 
-  it('should return messages by author from getMessagesByAuthor', () => {
+  it('should return messages by author from getMessagesByAuthor', async () => {
     const authorId = 'a1';
     const messagesByAuthor = [
       {
@@ -84,17 +92,14 @@ describe('MessageResolver', () => {
         createdAt: new Date(),
       },
     ];
-
-    mockMessageService.findByAuthorId.mockReturnValue(messagesByAuthor);
-
-    const result = resolver.getMessagesByAuthor(authorId);
-
+    mockMessageService.findByAuthorId.mockResolvedValue(messagesByAuthor);
+    const result = await resolver.getMessagesByAuthor(authorId);
     expect(mockMessageService.findByAuthorId).toHaveBeenCalledTimes(1);
     expect(mockMessageService.findByAuthorId).toHaveBeenCalledWith(authorId);
     expect(result).toEqual(messagesByAuthor);
   });
 
-  it('should return a message by id from getMessageById', () => {
+  it('should return a message by id from getMessageById', async () => {
     const messageId = 'msg-123';
     const message = {
       id: messageId,
@@ -103,17 +108,20 @@ describe('MessageResolver', () => {
       conversationId: 'convX',
       createdAt: new Date(),
     };
-
-    mockMessageService.findById.mockReturnValue(message);
-
-    const result = resolver.getMessageById(messageId);
-
+    mockMessageService.findById.mockResolvedValue(message);
+    const result = await resolver.getMessageById(messageId);
     expect(mockMessageService.findById).toHaveBeenCalledTimes(1);
     expect(mockMessageService.findById).toHaveBeenCalledWith(messageId);
     expect(result).toEqual(message);
   });
 
-  it('should return messages by conversationId from getByConversationId', () => {
+  it('should return null if no message is found by id', async () => {
+    mockMessageService.findById.mockResolvedValue(null);
+    const result = await resolver.getMessageById('not-exist');
+    expect(result).toBeNull();
+  });
+
+  it('should return messages by conversationId from getByConversationId', async () => {
     const conversationId = 'conv-123';
     const messages = [
       {
@@ -131,17 +139,18 @@ describe('MessageResolver', () => {
         createdAt: new Date(),
       },
     ];
-
-    mockMessageService.findByConversationId = jest
-      .fn()
-      .mockReturnValue(messages);
-
-    const result = resolver.getByConversationId(conversationId);
-
+    mockMessageService.findByConversationId.mockResolvedValue(messages);
+    const result = await resolver.getByConversationId(conversationId);
     expect(mockMessageService.findByConversationId).toHaveBeenCalledTimes(1);
     expect(mockMessageService.findByConversationId).toHaveBeenCalledWith(
       conversationId,
     );
     expect(result).toEqual(messages);
+  });
+
+  it('should return an empty array if no messages found by conversationId', async () => {
+    mockMessageService.findByConversationId.mockResolvedValue([]);
+    const result = await resolver.getByConversationId('not-exist');
+    expect(result).toEqual([]);
   });
 });

@@ -1,130 +1,164 @@
-// import { Test, TestingModule } from '@nestjs/testing';
-// import { MessageService } from './message.service';
-// import { CreateMessageInput } from './dto/create-message.input';
+import { Test, TestingModule } from '@nestjs/testing';
+import { MessageService } from './message.service';
+import { PrismaService } from 'prisma/prisma.service';
+import { CreateMessageInput } from './dto/create-message.input';
 
-// describe('MessageService', () => {
-//   let service: MessageService;
+describe('MessageService', () => {
+  let service: MessageService;
+  let mockPrismaService: any;
+  let mockQueueService: any;
 
-//   // Mock du QueueService avec addJob mocké
-//   const mockQueueService = {
-//     addJob: jest.fn(),
-//   };
+  beforeEach(async () => {
+    mockPrismaService = {
+      message: {
+        create: jest.fn(),
+        findMany: jest.fn(),
+        findUnique: jest.fn(),
+      },
+    };
+    mockQueueService = {
+      addJob: jest.fn(),
+    };
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        MessageService,
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: 'BullQueue_messages', useValue: mockQueueService },
+      ],
+    }).compile();
+    service = module.get<MessageService>(MessageService);
+  });
 
-//   beforeEach(async () => {
-//     const module: TestingModule = await Test.createTestingModule({
-//       providers: [
-//         MessageService,
-//         {
-//           provide: 'BullQueue_messages', // clé générée par @InjectQueue('messages')
-//           useValue: mockQueueService,
-//         },
-//       ],
-//     }).compile();
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 
-//     service = module.get<MessageService>(MessageService);
-//   });
+  describe('create', () => {
+    it('should create a new message and call addJob on queue', async () => {
+      const createMessageDto: CreateMessageInput = {
+        content: 'Salut',
+        authorId: 'author-1',
+        conversationId: 'conv-1',
+      };
+      const savedMessage = {
+        id: 'msg-1',
+        ...createMessageDto,
+        createdAt: new Date(),
+      };
+      mockPrismaService.message.create.mockResolvedValue(savedMessage);
+      mockQueueService.addJob.mockResolvedValue(undefined);
+      const result = await service.create(createMessageDto);
+      expect(mockPrismaService.message.create).toHaveBeenCalledWith({
+        data: expect.objectContaining(createMessageDto),
+      });
+      expect(mockQueueService.addJob).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(savedMessage);
+    });
+  });
 
-//   it('should be defined', () => {
-//     expect(service).toBeDefined();
-//   });
+  describe('findAll', () => {
+    it('should return all messages', async () => {
+      const messages = [
+        {
+          id: '1',
+          content: 'Hello',
+          authorId: 'a1',
+          conversationId: 'c1',
+          createdAt: new Date(),
+        },
+        {
+          id: '2',
+          content: 'World',
+          authorId: 'a2',
+          conversationId: 'c2',
+          createdAt: new Date(),
+        },
+      ];
+      mockPrismaService.message.findMany.mockResolvedValue(messages);
+      const result = await service.findAll();
+      expect(mockPrismaService.message.findMany).toHaveBeenCalledWith({
+        orderBy: { createdAt: 'asc' },
+      });
+      expect(result).toEqual(messages);
+    });
+  });
 
-//   it('should create a new message and call addJob on queue', async () => {
-//     const createMessageDto: CreateMessageInput = {
-//       content: 'Salut',
-//       authorId: 'author-1',
-//       conversationId: 'conv-1',
-//     };
+  describe('findByAuthorId', () => {
+    it('should return messages filtered by authorId', async () => {
+      const authorId = 'author1';
+      const messages = [
+        {
+          id: '1',
+          content: 'Msg',
+          authorId,
+          conversationId: 'c1',
+          createdAt: new Date(),
+        },
+      ];
+      mockPrismaService.message.findMany.mockResolvedValue(messages);
+      const result = await service.findByAuthorId(authorId);
+      expect(mockPrismaService.message.findMany).toHaveBeenCalledWith({
+        where: { authorId },
+        orderBy: { createdAt: 'asc' },
+      });
+      expect(result).toEqual(messages);
+    });
+  });
 
-//     const result = await service.create(createMessageDto);
+  describe('findById', () => {
+    it('should return the message with the given id', async () => {
+      const message = {
+        id: 'msg-1',
+        content: 'Unique',
+        authorId: 'a',
+        conversationId: 'c',
+        createdAt: new Date(),
+      };
+      mockPrismaService.message.findUnique.mockResolvedValue(message);
+      const result = await service.findById('msg-1');
+      expect(mockPrismaService.message.findUnique).toHaveBeenCalledWith({
+        where: { id: 'msg-1' },
+      });
+      expect(result).toEqual(message);
+    });
+    it('should return null if not found', async () => {
+      mockPrismaService.message.findUnique.mockResolvedValue(null);
+      const result = await service.findById('not-exist');
+      expect(result).toBeNull();
+    });
+  });
 
-//     // Vérifie que le message a bien été créé
-//     expect(result).toHaveProperty('id');
-//     expect(result.content).toBe(createMessageDto.content);
-
-//     // Vérifie que addJob a été appelé une fois avec les bons paramètres
-//     expect(mockQueueService.addJob).toHaveBeenCalledTimes(1);
-//     expect(mockQueueService.addJob).toHaveBeenCalledWith(
-//       `Conversation ${createMessageDto.conversationId}`,
-//       expect.objectContaining({
-//         messageId: expect.any(String),
-//         content: createMessageDto.content,
-//         authorId: createMessageDto.authorId,
-//         conversationId: createMessageDto.conversationId,
-//         createdAt: expect.any(String),
-//       }),
-//     );
-//   });
-
-//   it('should return all messages with findAll', async () => {
-//     // On ajoute un message via create (pour avoir du contenu)
-//     const createMessageDto = {
-//       content: 'Message test',
-//       authorId: 'author-2',
-//       conversationId: 'conv-2',
-//     };
-
-//     await service.create(createMessageDto);
-
-//     const allMessages = service.findAll();
-
-//     expect(allMessages.length).toBeGreaterThan(0);
-//     expect(allMessages[0]).toHaveProperty('content', 'Message test');
-//   });
-
-//   it('should return messages filtered by authorId with findByAuthorId', async () => {
-//     // Création de deux messages avec auteurs différents
-//     await service.create({
-//       content: 'Message de author1',
-//       authorId: 'author1',
-//       conversationId: 'conv1',
-//     });
-
-//     await service.create({
-//       content: 'Message de author2',
-//       authorId: 'author2',
-//       conversationId: 'conv2',
-//     });
-
-//     const messagesByAuthor1 = service.findByAuthorId('author1');
-//     expect(messagesByAuthor1.length).toBe(1);
-//     expect(messagesByAuthor1[0].authorId).toBe('author1');
-//     expect(messagesByAuthor1[0].content).toBe('Message de author1');
-//   });
-
-//   it('should return the message with the given id using findById', async () => {
-//     const createdMessage = await service.create({
-//       content: 'Message unique',
-//       authorId: 'authorX',
-//       conversationId: 'convX',
-//     });
-
-//     const foundMessage = service.findById(createdMessage.id);
-
-//     expect(foundMessage).toBeDefined();
-//     expect(foundMessage?.id).toBe(createdMessage.id);
-//     expect(foundMessage?.content).toBe('Message unique');
-//   });
-
-//   it('should return all messages for a given conversationId', async () => {
-//     await service.create({
-//       content: 'Msg 1',
-//       authorId: 'authorA',
-//       conversationId: 'conv123',
-//     });
-//     await service.create({
-//       content: 'Msg 2',
-//       authorId: 'authorB',
-//       conversationId: 'conv123',
-//     });
-//     await service.create({
-//       content: 'Msg 3',
-//       authorId: 'authorC',
-//       conversationId: 'conv999',
-//     });
-
-//     const messages = service.findByConversationId('conv123');
-
-//     expect(messages.length).toBe(2);
-//     expect(messages.every((m) => m.conversationId === 'conv123')).toBe(true);
-//   });
-// });
+  describe('findByConversationId', () => {
+    it('should return all messages for a given conversationId', async () => {
+      const conversationId = 'conv-123';
+      const messages = [
+        {
+          id: '1',
+          content: 'Msg 1',
+          authorId: 'a1',
+          conversationId,
+          createdAt: new Date(),
+        },
+        {
+          id: '2',
+          content: 'Msg 2',
+          authorId: 'a2',
+          conversationId,
+          createdAt: new Date(),
+        },
+      ];
+      mockPrismaService.message.findMany.mockResolvedValue(messages);
+      const result = await service.findByConversationId(conversationId);
+      expect(mockPrismaService.message.findMany).toHaveBeenCalledWith({
+        where: { conversationId },
+        orderBy: { createdAt: 'asc' },
+      });
+      expect(result).toEqual(messages);
+    });
+    it('should return an empty array if no messages found', async () => {
+      mockPrismaService.message.findMany.mockResolvedValue([]);
+      const result = await service.findByConversationId('not-exist');
+      expect(result).toEqual([]);
+    });
+  });
+});
