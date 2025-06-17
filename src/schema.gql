@@ -44,6 +44,7 @@ type Message {
 type Mutation {
   createConversation(p_createConversationInput: CreateConversationInput!): Conversation!
   createUser(createUserInput: CreateUserInput!): User!
+  deleteTestData(conversation_id: String!, userA_id: String!, userB_id: String!): Boolean!
   login(pass: String!, username: String!): String!
   removeUser(p_id: String!): String!
   sendMessage(createMessageInput: CreateMessageInput!): Message!

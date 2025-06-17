@@ -16,6 +16,7 @@ import { UsersService } from './users/users.service';
 import { AuthModule } from './auth/auth.module';
 import { AuthService } from './auth/auth.service';
 import { PrismaService } from 'prisma/prisma.service';
+import { TestModule } from 'src/test/test.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { PrismaService } from 'prisma/prisma.service';
     MessageModule,
     ConversationModule,
     AuthModule,
+    TestModule
   ],
   controllers: [AppController, HealthCheckController],
   providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService, PrismaService],

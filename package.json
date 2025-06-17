@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:api": "newman run test/kindoo.postman_collection.json -e test/kindoo-env.postman_environment.json"
+    "test:api": "newman run src/test/kindoo.postman_collection.json -e src/test/kindoo-env.postman_environment.json"
   },
   "dependencies": {
     "@apollo/server": "^4.12.1",
