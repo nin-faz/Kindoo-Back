@@ -27,22 +27,18 @@ export class MessageService {
       conversationId: p_createMessageDto.conversationId,
     };
 
-    const v_savedMessage = await this.s_prismaService.message.create({
-      data: v_newMessage,
-    });
-
     await this.s_queueService.addJob(
-      `Conversation ${v_savedMessage.conversationId}`,
+      `Conversation ${v_newMessage.conversationId}`,
       {
-        messageId: v_savedMessage.id,
-        content: v_savedMessage.content,
-        authorId: v_savedMessage.authorId,
-        conversationId: v_savedMessage.conversationId,
-        createdAt: v_savedMessage.createdAt.toISOString(),
+        messageId: v_newMessage.id,
+        content: v_newMessage.content,
+        authorId: v_newMessage.authorId,
+        conversationId: v_newMessage.conversationId,
+        createdAt: v_newMessage.createdAt.toISOString(),
       },
     );
     console.log('✅ Job ajouté dans la queue BullMQ');
-    return v_savedMessage;
+    return v_newMessage;
   }
 
   findAll(): Promise<Message[]> {
