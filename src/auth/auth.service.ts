@@ -19,7 +19,9 @@ export class AuthService {
     const { password, ...result } = user;
     const payload = { username: result.userName, sub: result.id };
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: this.jwtService.sign(payload, {
+        expiresIn: '10m', // Durée de validité du token
+      }),
     };
   }
 }
