@@ -9,7 +9,6 @@ describe('UsersResolver', () => {
   let resolver: UsersResolver;
   let service: UsersService;
 
-  // Mock UsersService
   const mockUsersService = {
     create: jest.fn(),
     findAll: jest.fn(),
@@ -57,7 +56,7 @@ describe('UsersResolver', () => {
   });
 
   describe('findAll', () => {
-    it('should call s_usersService.findAll and return an array of users', () => {
+    it('should call s_usersService.findAll and return an array of users', async () => {
       const expectedUsers: User[] = [
         {
           id: '1',
@@ -72,17 +71,15 @@ describe('UsersResolver', () => {
           createdAt: new Date(),
         },
       ];
-      mockUsersService.findAll.mockReturnValue(expectedUsers);
-
-      const result = resolver.findAll();
-
+      mockUsersService.findAll.mockResolvedValue(expectedUsers);
+      const result = await resolver.findAll();
       expect(mockUsersService.findAll).toHaveBeenCalledTimes(1);
       expect(result).toEqual(expectedUsers);
     });
   });
 
   describe('findOne', () => {
-    it('should call s_usersService.findOne and return a user', () => {
+    it('should call s_usersService.findOne and return a user', async () => {
       const userId = '0';
       const expectedUser: User = {
         id: '0',
@@ -90,18 +87,21 @@ describe('UsersResolver', () => {
         password: 'user0',
         createdAt: new Date(),
       };
-      mockUsersService.findOne.mockReturnValue(expectedUser);
-
-      const result = resolver.findOne(userId);
-
+      mockUsersService.findOne.mockResolvedValue(expectedUser);
+      const result = await resolver.findOne(userId);
       expect(mockUsersService.findOne).toHaveBeenCalledTimes(1);
       expect(mockUsersService.findOne).toHaveBeenCalledWith(userId);
       expect(result).toEqual(expectedUser);
     });
+    it('should return null if user is not found', async () => {
+      mockUsersService.findOne.mockResolvedValue(null);
+      const result = await resolver.findOne('not-exist');
+      expect(result).toBeNull();
+    });
   });
 
   describe('updateUser', () => {
-    it('should call s_usersService.update and return the updated user', () => {
+    it('should call s_usersService.update and return the updated user', async () => {
       const userId = '0';
       const updateInput: UpdateUserInput = {
         userName: 'userUpdated',
@@ -113,10 +113,8 @@ describe('UsersResolver', () => {
         password: 'newuser',
         createdAt: new Date(),
       };
-      mockUsersService.update.mockReturnValue(updatedUser);
-
-      const result = resolver.updateUser(updateInput, userId);
-
+      mockUsersService.update.mockResolvedValue(updatedUser);
+      const result = await resolver.updateUser(updateInput, userId);
       expect(mockUsersService.update).toHaveBeenCalledTimes(1);
       expect(mockUsersService.update).toHaveBeenCalledWith(userId, updateInput);
       expect(result).toEqual(updatedUser);
@@ -124,21 +122,13 @@ describe('UsersResolver', () => {
   });
 
   describe('removeUser', () => {
-    it('should call s_usersService.remove and return the removed user', () => {
+    it('should call s_usersService.remove and return the removed user id as string', async () => {
       const userId = '0';
-      const removedUser: User = {
-        id: '0',
-        userName: 'removeUser',
-        password: 'removeUser',
-        createdAt: new Date(),
-      };
-      mockUsersService.remove.mockReturnValue(removedUser);
-
-      const result = resolver.removeUser(userId);
-
+      mockUsersService.remove.mockResolvedValue(userId);
+      const result = await resolver.removeUser(userId);
       expect(mockUsersService.remove).toHaveBeenCalledTimes(1);
       expect(mockUsersService.remove).toHaveBeenCalledWith(userId);
-      expect(result).toEqual(removedUser);
+      expect(result).toEqual(userId);
     });
   });
 });

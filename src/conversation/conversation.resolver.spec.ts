@@ -8,12 +8,12 @@ describe('ConversationResolver', () => {
   let resolver: ConversationResolver;
   let service: ConversationService;
 
-  // Mock ConversationService
   const mockConversationService = {
     create: jest.fn(),
     findAll: jest.fn(),
     findOne: jest.fn(),
     findByParticipantId: jest.fn(),
+    findByParticipants: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -25,7 +25,7 @@ describe('ConversationResolver', () => {
     }).compile();
 
     resolver = module.get<ConversationResolver>(ConversationResolver);
-    service = module.get<ConversationService>(ConversationService); // In case we need to directly access the mock
+    service = module.get<ConversationService>(ConversationService);
   });
 
   it('should be defined', () => {
@@ -104,7 +104,7 @@ describe('ConversationResolver', () => {
 
   describe('findOne', () => {
     it('should call s_conversationService.findOne and return a conversation', () => {
-      const conversationId = 123;
+      const conversationId = '123';
       const expectedConversation: Conversation = {
         id: 'conv-123',
         createdAt: new Date(),
@@ -165,6 +165,57 @@ describe('ConversationResolver', () => {
         participantId,
       );
       expect(result).toEqual(expectedConversations);
+    });
+  });
+
+  describe('findByParticipants', () => {
+    it('should call s_conversationService.findByParticipants and return the conversation', () => {
+      const participantsIds = ['user-1', 'user-2'];
+      const expectedConversation: Conversation = {
+        id: 'conv-xyz',
+        createdAt: new Date(),
+        participants: [
+          {
+            id: 'user-1',
+            userName: 'User One',
+            password: '',
+            createdAt: new Date(),
+          },
+          {
+            id: 'user-2',
+            userName: 'User Two',
+            password: '',
+            createdAt: new Date(),
+          },
+        ],
+      };
+      mockConversationService.findByParticipants = jest
+        .fn()
+        .mockReturnValue(expectedConversation);
+
+      const result = resolver.findByParticipants(participantsIds);
+
+      expect(mockConversationService.findByParticipants).toHaveBeenCalledTimes(
+        1,
+      );
+      expect(mockConversationService.findByParticipants).toHaveBeenCalledWith(
+        participantsIds,
+      );
+      expect(result).toEqual(expectedConversation);
+    });
+
+    it('should return null if no conversation is found', () => {
+      const participantsIds = ['user-x', 'user-y'];
+      mockConversationService.findByParticipants = jest
+        .fn()
+        .mockReturnValue(null);
+
+      const result = resolver.findByParticipants(participantsIds);
+
+      expect(mockConversationService.findByParticipants).toHaveBeenCalledWith(
+        participantsIds,
+      );
+      expect(result).toBeNull();
     });
   });
 });
