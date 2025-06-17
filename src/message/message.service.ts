@@ -4,14 +4,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { CreateMessageInput } from './dto/create-message.input';
 import { InjectQueue } from '@nestjs/bullmq';
 import { QueueService } from '../bullMQ/queue.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class MessageService {
   constructor(
     @InjectQueue('messages') private readonly s_queueService: QueueService,
-  ) {}
+    p_prismaService: PrismaService,
+  ) 
+  {
+    this.s_prismaService = p_prismaService;
+  }
 
-  private readonly e_messages: Message[] = [];
+  private readonly s_prismaService: PrismaService;
 
   async create(p_createMessageDto: CreateMessageInput): Promise<Message> {
     const v_newMessage: Message = {
@@ -21,36 +26,48 @@ export class MessageService {
       authorId: p_createMessageDto.authorId,
       conversationId: p_createMessageDto.conversationId,
     };
-    this.e_messages.push(v_newMessage);
+
+    const v_savedMessage = await this.s_prismaService.message.create({
+      data: v_newMessage,
+    });
 
     await this.s_queueService.addJob(
-      `Conversation ${v_newMessage.conversationId}`,
+      `Conversation ${v_savedMessage.conversationId}`,
       {
-        messageId: v_newMessage.id,
-        content: v_newMessage.content,
-        authorId: v_newMessage.authorId,
-        conversationId: v_newMessage.conversationId,
-        createdAt: v_newMessage.createdAt.toISOString(),
+        messageId: v_savedMessage.id,
+        content: v_savedMessage.content,
+        authorId: v_savedMessage.authorId,
+        conversationId: v_savedMessage.conversationId,
+        createdAt: v_savedMessage.createdAt.toISOString(),
       },
     );
-    return v_newMessage;
+    console.log('✅ Job ajouté dans la queue BullMQ');
+    return v_savedMessage;
   }
 
-  findAll(): Message[] {
-    return this.e_messages;
+  findAll(): Promise<Message[]> {
+    return this.s_prismaService.message.findMany({
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
-  findByAuthorId(p_authorId: string): Message[] {
-    return this.e_messages.filter((msg) => msg.authorId === p_authorId);
+  findByAuthorId(p_authorId: string): Promise<Message[]> {
+    return this.s_prismaService.message.findMany({
+      where: { authorId: p_authorId },
+      orderBy: { createdAt: 'asc' },
+    });
   }
 
-  findById(p_id: string): Message | undefined {
-    return this.e_messages.find((msg) => msg.id === p_id);
+  findById(p_id: string): Promise<Message | null> {
+    return this.s_prismaService.message.findUnique({
+      where: { id: p_id }, 
+    });
   }
 
-  findByConversationId(p_conversationId: string): Message[] {
-    return this.e_messages.filter(
-      (msg) => msg.conversationId === p_conversationId,
-    );
+  findByConversationId(p_conversationId: string): Promise<Message[]> {
+    return this.s_prismaService.message.findMany({
+      where: { conversationId: p_conversationId },
+      orderBy: { createdAt: 'asc' },
+    });
   }
 }

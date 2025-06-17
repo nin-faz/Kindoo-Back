@@ -1,15 +1,6 @@
 version: '3.8'
 
 services:
-  redis:
-    image: redis:latest
-    container_name: redis
-    ports:
-      - '6379:6379'
-    restart: always
-    networks:
-      - app-network
-
   app:
     build:
       context: .
@@ -21,6 +12,17 @@ services:
     restart: always
     networks:
       - app-network
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    restart: always
+    networks:
+      - app-network
+    command: ["node", "dist/src/bullMQ/queue.consumer.js"]
 
 networks:
   app-network:

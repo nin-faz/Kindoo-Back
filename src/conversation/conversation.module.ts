@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConversationService } from './conversation.service';
 import { ConversationResolver } from './conversation.resolver';
-import { BullModule } from '@nestjs/bullmq';
+import { UsersModule } from 'src/users/users.module';
+import { PrismaModule } from 'prisma/prisma.module';
 
 @Module({
-  providers: [ConversationResolver, ConversationService],
+  imports: [UsersModule, PrismaModule],
+  providers: [ConversationResolver, ConversationService]
 })
 export class ConversationModule {}

@@ -13,13 +13,16 @@ import { ConversationModule } from './conversation/conversation.module';
 import { MessageService } from './message/message.service';
 import { ConversationService } from './conversation/conversation.service';
 import { UsersService } from './users/users.service';
+import { AuthModule } from './auth/auth.module';
+import { AuthService } from './auth/auth.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Module({
   imports: [
     BullModule.forRoot({
       connection: {
-        host: 'localhost',
-        port: 6379,
+        host: process.env.REDIS_HOST,
+        port: Number(process.env.REDIS_PORT) || 6379,
       },
     }),
     BullModule.registerQueue({
@@ -35,8 +38,10 @@ import { UsersService } from './users/users.service';
     UsersModule,
     MessageModule,
     ConversationModule,
+    AuthModule,
   ],
   controllers: [AppController, HealthCheckController],
-  providers: [AppService, QueueService, MessageService, ConversationService, UsersService],
+  providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService, PrismaService],
+  exports: [PrismaService],
 })
 export class AppModule {}
