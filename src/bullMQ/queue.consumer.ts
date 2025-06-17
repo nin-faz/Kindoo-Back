@@ -1,5 +1,8 @@
+import { PrismaClient } from '@prisma/client';
 import { Worker } from 'bullmq';
 import { MessageGateway } from 'src/message/message.gateway';
+
+const v_prisma = new PrismaClient();
 
 export function startWorker(p_gateway: MessageGateway) {
   if (!process.env.REDIS_HOST) {
@@ -13,7 +16,20 @@ export function startWorker(p_gateway: MessageGateway) {
       console.log(`📝 Job name: ${job.name}`);
       console.log(`⏰ Job timestamp: ${new Date(job.timestamp).toISOString()}`);
 
+      const v_savedMessage = await v_prisma.message.create({
+        data: {
+          id: job.data.messageId,
+          content: job.data.content,
+          createdAt: new Date(job.data.createdAt),
+          authorId: job.data.authorId,
+          conversationId: job.data.conversationId,
+        },
+      });
+
+      console.log(`✅ Message enregistré en BDD avec l'id: ${v_savedMessage.id}`);
+
       p_gateway.sendNewMessage(job.data);
+      console.log(`📤 Message envoyé au WebSocket: ${job.data.messageId}`);
     },
     {
       connection: {
