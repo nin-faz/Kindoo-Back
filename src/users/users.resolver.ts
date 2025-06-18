@@ -20,8 +20,13 @@ export class UsersResolver {
 
 
   @Query(() => User)
-  async findOne(@Args('p_id', { type: () => String }) p_id: string): Promise<User | null> {
-    return this.s_usersService.findOne(p_id);
+  async findOne(@Args('p_username', { type: () => String }) p_username: string): Promise<User | null> {
+    return this.s_usersService.findOne(p_username);
+  }
+
+  @Query(() => [User], { name: 'findOneById' })
+  async findOneById(@Args('p_id', { type: () => String }) p_id: string): Promise<User | null> {
+    return this.s_usersService.findOneById(p_id);
   }
 
   @Mutation(() => User)
