@@ -4,32 +4,36 @@ import { MessageGateway } from 'src/message/message.gateway';
 
 const v_prisma = new PrismaClient();
 
+/**
+ * Démarre le worker BullMQ pour traiter les messages.
+ * @param p_gateway L'instance de MessageGateway pour envoyer les messages traités.
+ */
 export function startWorker(p_gateway: MessageGateway) {
   if (!process.env.REDIS_HOST) {
     throw new Error('❌ REDIS_HOST is not defined');
   }
 
-  const worker = new Worker(
+  const v_worker = new Worker(
     'messages',
-    async (job) => {
-      console.log(`🔄 Processing job ${job.id}:`, job.data);
-      console.log(`📝 Job name: ${job.name}`);
-      console.log(`⏰ Job timestamp: ${new Date(job.timestamp).toISOString()}`);
+    async (p_job) => {
+      console.log(`🔄 Processing job ${p_job.id}:`, p_job.data);
+      console.log(`📝 Job name: ${p_job.name}`);
+      console.log(`⏰ Job timestamp: ${new Date(p_job.timestamp).toISOString()}`);
 
       const v_savedMessage = await v_prisma.message.create({
         data: {
-          id: job.data.messageId,
-          content: job.data.content,
-          createdAt: new Date(job.data.createdAt),
-          authorId: job.data.authorId,
-          conversationId: job.data.conversationId,
+          id: p_job.data.messageId,
+          content: p_job.data.content,
+          createdAt: new Date(p_job.data.createdAt),
+          authorId: p_job.data.authorId,
+          conversationId: p_job.data.conversationId,
         },
       });
 
       console.log(`✅ Message enregistré en BDD avec l'id: ${v_savedMessage.id}`);
 
-      p_gateway.sendNewMessage(job.data);
-      console.log(`📤 Message envoyé au WebSocket: ${job.data.messageId}`);
+      p_gateway.sendNewMessage(p_job.data);
+      console.log(`📤 Message envoyé au WebSocket: ${p_job.data.messageId}`);
     },
     {
       connection: {
@@ -39,15 +43,15 @@ export function startWorker(p_gateway: MessageGateway) {
     },
   );
 
-  worker.on('failed', (job, err) => {
-    console.error(`❌ Job ${job?.id} failed:`, err);
+  v_worker.on('failed', (p_job, err) => {
+    console.error(`❌ Job ${p_job?.id} failed:`, err);
   });
 
-  worker.on('error', (err) => {
+  v_worker.on('error', (err) => {
     console.error('🚨 Worker error:', err);
   });
 
-  worker.on('ready', () => {
+  v_worker.on('ready', () => {
     console.log('✅ Worker is ready and connected to Redis');
   });
 
@@ -56,7 +60,7 @@ export function startWorker(p_gateway: MessageGateway) {
   // Fermer proprement à l'arrêt
   process.on('SIGINT', async () => {
     console.log('🛑 Shutting down worker...');
-    await worker.close();
+    await v_worker.close();
     process.exit(0);
   });
 

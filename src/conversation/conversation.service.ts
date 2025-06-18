@@ -7,24 +7,26 @@ import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class ConversationService {
-  private e_conversation: Conversation[] = [];
   private readonly s_prismaService: PrismaService;
 
   constructor(
-    private readonly usersService: UsersService,
+    private readonly s_usersService: UsersService,
     p_prismaService: PrismaService,
-    private readonly eventEmitter: EventEmitter2
+    private readonly s_eventEmitter: EventEmitter2
   ) {
     this.s_prismaService = p_prismaService;
   }
 
-  async create(
-    p_createConversationInput: CreateConversationInput
-  ): Promise<Conversation> {
+  /**
+   * Crée une nouvelle conversation avec les participants.
+   * @param p_createConversationInput - Input contenant les IDs des participants.
+   * @returns La conversation créée.
+   */
+  async create(p_createConversationInput: CreateConversationInput): Promise<Conversation> {
     const v_participantIds = p_createConversationInput.participantIds;
 
     const v_foundUsers = await Promise.all(
-      v_participantIds.map((id) => this.usersService.findOneById(id))
+      v_participantIds.map((p_id) => this.s_usersService.findOneById(p_id)),// On peut mettre findByUsername si on veut
     );
 
     const v_validUsers = v_foundUsers.filter((u) => u !== null);
@@ -44,17 +46,26 @@ export class ConversationService {
     });
 
     // Émettre un événement lors de la création
-    this.eventEmitter.emit('conversation.created', conversation);
+    this.s_eventEmitter.emit('conversation.created', conversation);
 
     return conversation;
   }
 
+  /**
+   * Récupère toutes les conversations.
+   * @returns La liste de toutes les conversations.
+   */
   findAll(): Promise<Conversation[]> {
     return this.s_prismaService.conversation.findMany({
       include: { participants: true },
     });
   }
 
+  /**
+   * Récupère une conversation par son ID.
+   * @param p_id - L'ID de la conversation à récupérer.
+   * @returns La conversation correspondante ou null si elle n'existe pas.
+   */
   findOne(p_id: string): Promise<Conversation | null> {
     return this.s_prismaService.conversation.findUnique({
       where: { id: p_id },
@@ -62,6 +73,11 @@ export class ConversationService {
     });
   }
 
+  /**
+   * Récupère les conversations d'un participant par son ID.
+   * @param p_participantId - L'ID du participant.
+   * @returns La liste des conversations auxquelles le participant participe.
+   */
   findByParticipantId(p_participantId: string): Promise<Conversation[]> {
     return this.s_prismaService.conversation.findMany({
       where: {
@@ -73,6 +89,11 @@ export class ConversationService {
     });
   }
 
+  /**
+   * Récupère une conversation par les IDs de ses participants.
+   * @param p_userIds - Liste des IDs des participants.
+   * @returns La conversation correspondante ou null si elle n'existe pas.
+   */
   async findByParticipants(p_userIds: string[]): Promise<Conversation | null> {
     const conversations = await this.s_prismaService.conversation.findMany({
       include: { participants: true },

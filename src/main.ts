@@ -12,10 +12,10 @@ async function bootstrap() {
   v_app.enableCors();
 
   // Récupère l'instance Express par défaut
-  const expressApp = v_app.getHttpAdapter().getInstance();
+  const v_expressApp = v_app.getHttpAdapter().getInstance();
 
   // Setup bull-arena avec Express directement
-  setupArena(expressApp);
+  setupArena(v_expressApp);
 
   await v_app.listen(process.env.PORT ?? 3000);
 

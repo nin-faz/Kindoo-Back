@@ -18,6 +18,11 @@ export class MessageService {
 
   private readonly s_prismaService: PrismaService;
 
+  /**
+   * Crée un nouveau message et l'ajoute à la queue BullMQ.
+   * @param p_createMessageDto - Input contenant les détails du message.
+   * @returns Le message créé.
+   */
   async create(p_createMessageDto: CreateMessageInput): Promise<Message> {
     const v_newMessage: Message = {
       id: uuidv4(),
@@ -41,12 +46,21 @@ export class MessageService {
     return v_newMessage;
   }
 
+  /**
+   * Récupère tous les messages, triés par date de création.
+   * @returns La liste de tous les messages.
+   */
   findAll(): Promise<Message[]> {
     return this.s_prismaService.message.findMany({
       orderBy: { createdAt: 'asc' },
     });
   }
 
+  /**
+   * Récupère les messages d'un auteur spécifique, triés par date de création.
+   * @param p_authorId - L'ID de l'auteur des messages à récupérer.
+   * @returns La liste des messages de l'auteur spécifié.
+   */
   findByAuthorId(p_authorId: string): Promise<Message[]> {
     return this.s_prismaService.message.findMany({
       where: { authorId: p_authorId },
@@ -54,12 +68,22 @@ export class MessageService {
     });
   }
 
+  /**
+   * Récupère un message par son ID.
+   * @param p_id - L'ID du message à récupérer.
+   * @returns Le message correspondant ou null si il n'existe pas.
+   */
   findById(p_id: string): Promise<Message | null> {
     return this.s_prismaService.message.findUnique({
       where: { id: p_id }, 
     });
   }
 
+  /**
+   * Récupère les messages d'une conversation spécifique, triés par date de création.
+   * @param p_conversationId - L'ID de la conversation dont on veut récupérer les messages.
+   * @returns La liste des messages de la conversation spécifiée.
+   */
   findByConversationId(p_conversationId: string): Promise<Message[]> {
     return this.s_prismaService.message.findMany({
       where: { conversationId: p_conversationId },
