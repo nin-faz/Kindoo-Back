@@ -22,7 +22,7 @@
 							"  pm.expect(pm.response.code).to.eql(200);\r",
 							"});\r",
 							"\r",
-							"if (v_res.data && v_res.data.user1 && v_res.data.user2) {\r",
+							"if (v_res.data) {\r",
 							"  pm.environment.set(\"userA_id\", v_res.data.user1.id);\r",
 							"  pm.environment.set(\"userB_id\", v_res.data.user2.id);\r",
 							"\r",
@@ -31,7 +31,7 @@
 							"    userB: v_res.data.user2.id,\r",
 							"  });\r",
 							"} else {\r",
-							"  console.warn(\"⚠️ Réponse invalide ou erreur de création d'utilisateur.\", v_res);\r",
+							"  console.warn(\"⚠️ Réponse invalide ou erreur de création d'utilisateur.\", v_res.errors);\r",
 							"}\r",
 							""
 						],
@@ -46,7 +46,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation CreateTwoUsers($userA: CreateUserInput!, $userB: CreateUserInput!) {\r\n  user1: createUser(createUserInput: $userA) {\r\n    id\r\n    userName\r\n    password\r\n  }\r\n  user2: createUser(createUserInput: $userB) {\r\n    id\r\n    userName\r\n    password\r\n  }\r\n}\r\n",
+						"query": "mutation CreateTwoUsers($userA: CreateUserInput!, $userB: CreateUserInput!) {\r\n  user1: createUser(p_createUserInput: $userA) {\r\n    id\r\n    userName\r\n    password\r\n  }\r\n  user2: createUser(p_createUserInput: $userB) {\r\n    id\r\n    userName\r\n    password\r\n  }\r\n}\r\n",
 						"variables": "{\r\n  \"userA\": {\r\n    \"userName\": \"UserA\",\r\n    \"password\": \"1234\"\r\n  },\r\n  \"userB\": {\r\n    \"userName\": \"UserB\",\r\n    \"password\": \"5678\"\r\n  }\r\n}\r\n"
 					}
 				},
@@ -153,8 +153,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation SendMessage($createMessageInput: CreateMessageInput!) {\r\n  sendMessage(createMessageInput: $createMessageInput) {\r\n    id\r\n    content\r\n    authorId\r\n    conversationId\r\n  }\r\n}\r\n",
-						"variables": "{\r\n  \"createMessageInput\": {\r\n    \"content\": \"Salut ça va?\",\r\n    \"authorId\": \"{{userA_id}}\",\r\n    \"conversationId\": \"{{conversation_id}}\"\r\n  }\r\n}\r\n"
+						"query": "mutation SendMessage($input: CreateMessageInput!) {\r\n  sendMessage(p_createMessageInput: $input) {\r\n    id\r\n    content\r\n    authorId\r\n    conversationId\r\n  }\r\n}\r\n",
+						"variables": "{\r\n  \"input\": {\r\n    \"content\": \"Salut ça va?\",\r\n    \"authorId\": \"{{userA_id}}\",\r\n    \"conversationId\": \"{{conversation_id}}\"\r\n  }\r\n}\r\n"
 					}
 				},
 				"url": {
@@ -206,8 +206,8 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation SendMessage($createMessageInput: CreateMessageInput!) {\r\n  sendMessage(createMessageInput: $createMessageInput) {\r\n    id\r\n    content\r\n    authorId\r\n    conversationId\r\n  }\r\n}\r\n",
-						"variables": "{\r\n  \"createMessageInput\": {\r\n    \"content\": \"Salut; bien et toi?\",\r\n    \"authorId\": \"{{userA_id}}\",\r\n    \"conversationId\": \"{{conversation_id}}\"\r\n  }\r\n}\r\n"
+						"query": "mutation SendMessage($input: CreateMessageInput!) {\r\n  sendMessage(p_createMessageInput: $input) {\r\n    id\r\n    content\r\n    authorId\r\n    conversationId\r\n  }\r\n}\r\n",
+						"variables": "{\r\n  \"input\": {\r\n    \"content\": \"Salut, bien et toi?\",\r\n    \"authorId\": \"{{userA_id}}\",\r\n    \"conversationId\": \"{{conversation_id}}\"\r\n  }\r\n}\r\n"
 					}
 				},
 				"url": {
@@ -259,7 +259,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "query GetByConversation($conversationId: String!) {\r\n  getByConversationId(conversationId: $conversationId) {\r\n    id\r\n    content\r\n    authorId\r\n    createdAt\r\n  }\r\n}\r\n",
+						"query": "query GetByConversation($conversationId: String!) {\r\n  getByConversationId(p_conversationId: $conversationId) {\r\n    id\r\n    content\r\n    authorId\r\n    createdAt\r\n  }\r\n}\r\n",
 						"variables": "{\r\n  \"conversationId\": \"{{conversation_id}}\"\r\n}\r\n"
 					}
 				},
@@ -367,7 +367,7 @@
 				"body": {
 					"mode": "graphql",
 					"graphql": {
-						"query": "mutation DeleteTestData(\r\n  $p_userA_id: String!\r\n  $p_userB_id: String!\r\n  $p_conversation_id: String!\r\n) {\r\n  deleteTestData(\r\n    userA_id: $p_userA_id\r\n    userB_id: $p_userB_id\r\n    conversation_id: $p_conversation_id\r\n  )\r\n}\r\n",
+						"query": "mutation DeleteTestData(\r\n  $p_userA_id: String!\r\n  $p_userB_id: String!\r\n  $p_conversation_id: String!\r\n) {\r\n  deleteTestData(\r\n    p_userA_id: $p_userA_id\r\n    p_userB_id: $p_userB_id\r\n    p_conversation_id: $p_conversation_id\r\n  )\r\n}\r\n",
 						"variables": "{\r\n  \"p_userA_id\": \"{{userA_id}}\",\r\n  \"p_userB_id\": \"{{userB_id}}\",\r\n  \"p_conversation_id\": \"{{conversation_id}}\"\r\n}\r\n"
 					}
 				},
