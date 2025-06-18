@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CreateConversationInput } from './dto/create-conversation.input';
-import { v4 as uuidv4 } from 'uuid';
 import { Conversation } from './entities/conversation.entity';
 import { UsersService } from 'src/users/users.service';
 import { PrismaService } from 'prisma/prisma.service';
@@ -10,23 +10,21 @@ export class ConversationService {
   private e_conversation: Conversation[] = [];
   private readonly s_prismaService: PrismaService;
 
-  constructor( private readonly usersService: UsersService, p_prismaService: PrismaService) {
+  constructor(
+    private readonly usersService: UsersService,
+    p_prismaService: PrismaService,
+    private readonly eventEmitter: EventEmitter2
+  ) {
     this.s_prismaService = p_prismaService;
   }
 
-  private findUserById(userId: string) {
-    for (const v_conv of this.e_conversation) {
-      const user = v_conv.participants.find((p) => p.id === userId);
-      if (user) return user;
-    }
-    return null;
-  }
-
-  async create(p_createConversationInput: CreateConversationInput): Promise<Conversation> {
+  async create(
+    p_createConversationInput: CreateConversationInput
+  ): Promise<Conversation> {
     const v_participantIds = p_createConversationInput.participantIds;
 
     const v_foundUsers = await Promise.all(
-      v_participantIds.map((id) => this.usersService.findOneById(id)),// On peut mettre findByUsername si on veut
+      v_participantIds.map((id) => this.usersService.findOneById(id))
     );
 
     const v_validUsers = v_foundUsers.filter((u) => u !== null);
@@ -34,7 +32,7 @@ export class ConversationService {
       throw new NotFoundException('Un ou plusieurs utilisateurs introuvables');
     }
 
-    return this.s_prismaService.conversation.create({
+    const conversation = await this.s_prismaService.conversation.create({
       data: {
         participants: {
           connect: v_participantIds.map((id) => ({ id })),
@@ -44,6 +42,11 @@ export class ConversationService {
         participants: true,
       },
     });
+
+    // Émettre un événement lors de la création
+    this.eventEmitter.emit('conversation.created', conversation);
+
+    return conversation;
   }
 
   findAll(): Promise<Conversation[]> {
@@ -75,9 +78,10 @@ export class ConversationService {
       include: { participants: true },
     });
 
-    const v_found = conversations.find((conv) =>
-      conv.participants.length === p_userIds.length &&
-      conv.participants.every((p) => p_userIds.includes(p.id)),
+    const v_found = conversations.find(
+      (conv) =>
+        conv.participants.length === p_userIds.length &&
+        conv.participants.every((p) => p_userIds.includes(p.id))
     );
     return v_found ?? null;
   }
