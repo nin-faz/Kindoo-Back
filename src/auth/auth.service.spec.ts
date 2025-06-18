@@ -38,10 +38,13 @@ describe('AuthService', () => {
       mockJwtService.sign.mockReturnValue('jwt-token');
       const result = await service.signIn('user1', 'pass');
       expect(mockUsersService.findOne).toHaveBeenCalledWith('user1');
-      expect(mockJwtService.sign).toHaveBeenCalledWith({
-        username: 'user1',
-        sub: '1',
-      });
+      expect(mockJwtService.sign).toHaveBeenCalledWith(
+        {
+          username: 'user1',
+          sub: '1',
+        },
+        { expiresIn: '10m' },
+      );
       expect(result).toEqual({ access_token: 'jwt-token' });
     });
 

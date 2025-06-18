@@ -3,6 +3,7 @@ import { ConversationService } from './conversation.service';
 import { CreateConversationInput } from './dto/create-conversation.input';
 import { PrismaService } from 'prisma/prisma.service';
 import { UsersService } from 'src/users/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 const mockPrismaService = {
   conversation: {
@@ -16,6 +17,8 @@ const mockUsersService = {
   findOneById: jest.fn(),
 };
 
+const mockEventEmitter = { emit: jest.fn() };
+
 describe('ConversationService', () => {
   let service: ConversationService;
 
@@ -26,6 +29,7 @@ describe('ConversationService', () => {
         ConversationService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: UsersService, useValue: mockUsersService },
+        { provide: EventEmitter2, useValue: mockEventEmitter },
       ],
     }).compile();
 

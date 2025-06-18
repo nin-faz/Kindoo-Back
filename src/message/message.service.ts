@@ -11,8 +11,7 @@ export class MessageService {
   constructor(
     @InjectQueue('messages') private readonly s_queueService: QueueService,
     p_prismaService: PrismaService,
-  ) 
-  {
+  ) {
     this.s_prismaService = p_prismaService;
   }
 
@@ -24,14 +23,19 @@ export class MessageService {
    * @returns Le message créé.
    */
   async create(p_createMessageDto: CreateMessageInput): Promise<Message> {
-    const v_newMessage: Message = {
+    // Générer un nouvel ID pour le message
+    const v_newMessageData = {
       id: uuidv4(),
       content: p_createMessageDto.content,
       createdAt: new Date(),
       authorId: p_createMessageDto.authorId,
       conversationId: p_createMessageDto.conversationId,
     };
-
+    // Sauvegarder le message en base
+    const v_newMessage = await this.s_prismaService.message.create({
+      data: v_newMessageData,
+    });
+    // Ajouter le job à la queue
     await this.s_queueService.addJob(
       `Conversation ${v_newMessage.conversationId}`,
       {
@@ -75,7 +79,7 @@ export class MessageService {
    */
   findById(p_id: string): Promise<Message | null> {
     return this.s_prismaService.message.findUnique({
-      where: { id: p_id }, 
+      where: { id: p_id },
     });
   }
 
