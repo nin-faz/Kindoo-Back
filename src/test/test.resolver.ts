@@ -9,30 +9,37 @@ export class TestResolver {
         private readonly prisma: PrismaService,
     ) {}
 
+    /**
+     * Mutation pur supprimer les donnees creees durant les tests d'integrations.
+     * @param userA_id - ID du premier utilisateur testé
+     * @param userB_id - ID du second utilisateur testé
+     * @param conversation_id - ID de la conversation de test à supprimer
+     * @returns Un boolean indiquant si la suppression a réussi
+     */
     @Mutation(() => Boolean)
     async deleteTestData(
-    @Args('userA_id') userA_id: string,
-        @Args('userB_id') userB_id: string,
-        @Args('conversation_id') conversation_id: string,
+    @Args('p_userA_id') p_userA_id: string,
+        @Args('p_userB_id') p_userB_id: string,
+        @Args('p_conversation_id') p_conversation_id: string,
         ): Promise<boolean> {
         try {
             await this.prisma.message.deleteMany({
             where: {
                 OR: [
-                { authorId: userA_id },
-                { authorId: userB_id },
-                { conversationId: conversation_id },
+                { authorId: p_userA_id },
+                { authorId: p_userB_id },
+                { conversationId: p_conversation_id },
                 ],
             },
             });
 
             await this.prisma.conversation.deleteMany({
-            where: { id: conversation_id },
+            where: { id: p_conversation_id },
             });
 
             await this.prisma.user.deleteMany({
             where: {
-                id: { in: [userA_id, userB_id] },
+                id: { in: [p_userA_id, p_userB_id] },
             },
             });
 

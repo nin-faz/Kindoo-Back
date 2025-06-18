@@ -8,10 +8,16 @@ export class QueueService {
     @InjectQueue('messages') private readonly queue: Queue, // nom en minuscules
   ) {}
 
-  async addJob(name: string, data: any) {
-    console.log(`📤 Adding job "${name}" to queue with data:`, data);
-    const job = await this.queue.add(name, data);
-    console.log(`📋 Job added with ID: ${job.id}`);
-    return job;
+  /**
+   * Ajoute un job à la queue.
+   * @param p_name Le nom du job
+   * @param p_data Les données associées au job
+   * @returns Le job ajouté
+   */
+  async addJob(p_name: string, p_data: any) {
+    console.log(`📤 Adding job "${p_name}" to queue with data:`, p_data);
+    const v_job = await this.queue.add(p_name, p_data);
+    console.log(`📋 Job added with ID: ${v_job.id}`);
+    return v_job;
   }
 }

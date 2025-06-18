@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { BullModule } from '@nestjs/bullmq';
-import { HealthCheckController } from './healthCheck/healthCheck.controller';
 import { QueueService } from './bullMQ/queue.service';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
@@ -26,10 +25,6 @@ import { TestModule } from 'src/test/test.module';
         port: Number(process.env.REDIS_PORT) || 6379,
       },
     }),
-    BullModule.registerQueue({
-      name: 'healthCheck',
-    }),
-
     
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -42,7 +37,7 @@ import { TestModule } from 'src/test/test.module';
     AuthModule,
     TestModule
   ],
-  controllers: [AppController, HealthCheckController],
+  controllers: [AppController],
   providers: [AppService, QueueService, MessageService, ConversationService, UsersService, AuthService, PrismaService],
   exports: [PrismaService],
 })

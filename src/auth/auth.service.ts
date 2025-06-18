@@ -6,21 +6,27 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService
+    private s_usersService: UsersService,
+    private s_jwtService: JwtService
   ) {}
 
-  async signIn(username: string, pass: string): Promise<any> {
+  /**
+   * Authentifie un utilisateur et génère un token JWT.
+   * @param p_username Le nom d'utilisateur
+   * @param p_pass Le mot de passe
+   * @returns Un objet contenant le token d'accès
+   */
+  async signIn(p_username: string, p_pass: string): Promise<any> {
     // Vérifie que l'utilisateur existe et que le mot de passe correspond
-    const user = await this.usersService.findOne(username);
-    if (!user || !(await bcrypt.compare(pass, user.password))) {
+    const v_user = await this.s_usersService.findOne(p_username);
+    if (!v_user || !(await bcrypt.compare(p_pass, v_user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
-    const { password, ...result } = user;
-    const payload = { username: result.userName, sub: result.id };
+    const { password, ...result } = v_user;
+    const v_payload = { username: result.userName, sub: result.id };
     return {
-      access_token: this.jwtService.sign(payload, {
-        expiresIn: '10m', // Durée de validité du token
+      access_token: this.s_jwtService.sign(v_payload, {
+        expiresIn: '10m',
       }),
     };
   }

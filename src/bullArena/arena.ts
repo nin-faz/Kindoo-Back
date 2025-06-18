@@ -7,20 +7,13 @@ const Arena = require('bull-arena');
 // On crée un routeur Express séparé
 const router: Router = require('express').Router();
 
-// Configuration d'Arena
+/**
+ * Configuration de Bull Arena pour la gestion des queues BullMQ.
+ */
 const arena = Arena(
   {
     BullMQ: Queue,
     queues: [
-      {
-        type: 'bullmq',
-        name: 'healthCheck',
-        hostId: 'Local',
-        redis: {
-          host: process.env.REDIS_HOST,
-          port: Number(process.env.REDIS_PORT) || 6379,
-        },
-      },
       {
         type: 'bullmq',
         name: 'messages',
